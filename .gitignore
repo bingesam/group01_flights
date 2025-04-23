@@ -2,8 +2,6 @@ __pycache__/
 *.py[cod]
 .env
 .DS_Store
-data/
-db/
 .ipynb_checkpoints/
 *.mp4
 *.csv
