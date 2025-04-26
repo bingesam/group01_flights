@@ -10,7 +10,7 @@ TOKEN = os.getenv("TRAVELPAYOUTS_TOKEN")
 
 def fetch_flight_data(origin="FRA", destination="BCN", currency="EUR"):
     #url = "https://api.travelpayouts.com/v1/prices/calendar"
-    url = "https://aviasales.tp.st/yqxWZ4Yn"
+    url = "https://api.travelpayouts.com/v2/prices/latest"
     params = {
         "origin": origin,
         "destination": destination,
