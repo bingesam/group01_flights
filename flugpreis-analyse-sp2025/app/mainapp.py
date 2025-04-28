@@ -1,5 +1,7 @@
 import requests
 import os
+import pandas as pd
+from scipy.stats import ttest_ind
 from dotenv import load_dotenv
 
 # Token laden
@@ -20,15 +22,52 @@ def fetch_flight_data(origin="FRA", destination="BCN", currency="EUR"):
     }
     
     response = requests.get(url, headers=headers, params=params)
+    
     print("Status Code:", response.status_code)
-    print("Antworttext:", response.text)
-
-    print("Status:", response.status_code)
-    print("Antwort:", response.text[:300])
+    print("Antworttext:", response.text[:300])  # Nur Vorschau anzeigen
     
     if response.status_code != 200:
-        print("❗ API Fehler")
+        print("❗ Fehler beim Abrufen der Flugdaten")
         return []
     
     data = response.json()
     return data.get("data", [])
+
+
+def prepare_dataframe(api_data):
+    records = []
+    for item in api_data:
+        departure_at = item.get("departure_at")
+        price = item.get("price")
+        transfers = item.get("transfers", 0)
+        
+        if departure_at and price:
+            records.append({
+                "date": departure_at,
+                "price": price,
+                "transfers": transfers
+            })
+    
+    df = pd.DataFrame(records)
+    
+    if df.empty:
+        print("⚠️ Keine gültigen Flugdaten im DataFrame!")
+    else:
+        df['date'] = pd.to_datetime(df['date'])  # Nur wenn DataFrame nicht leer ist!
+    
+    return df
+
+def analyze_price_distribution(df):
+    return df.describe()
+
+def compare_weekday_prices(df):
+    df["weekday"] = df["date"].dt.day_name()
+    weekdays = df.groupby("weekday")["price"].mean()
+    return weekdays
+
+def run_statistical_test(df):
+    df["weekday"] = df["date"].dt.day_name()
+    mon = df[df["weekday"] == "Monday"]["price"]
+    fri = df[df["weekday"] == "Friday"]["price"]
+    t_stat, p_val = ttest_ind(mon, fri, equal_var=False)
+    return t_stat, p_val
