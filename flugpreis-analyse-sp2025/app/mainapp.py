@@ -37,13 +37,13 @@ def fetch_flight_data(origin="FRA", destination="BCN", currency="EUR"):
 def prepare_dataframe(api_data):
     records = []
     for item in api_data:
-        departure_at = item.get("departure_at")
-        price = item.get("price")
-        transfers = item.get("transfers", 0)
+        date = item.get("depart_date")
+        price = item.get("value")
+        transfers = item.get("number_of_changes", 0)
         
-        if departure_at and price:
+        if date and price:
             records.append({
-                "date": departure_at,
+                "date": date,
                 "price": price,
                 "transfers": transfers
             })
@@ -53,7 +53,7 @@ def prepare_dataframe(api_data):
     if df.empty:
         print("⚠️ Keine gültigen Flugdaten im DataFrame!")
     else:
-        df['date'] = pd.to_datetime(df['date'])  # Nur wenn DataFrame nicht leer ist!
+        df['date'] = pd.to_datetime(df['date'])  # Datumsfeld umwandeln
     
     return df
 
