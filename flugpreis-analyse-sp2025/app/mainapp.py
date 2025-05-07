@@ -67,7 +67,14 @@ def compare_weekday_prices(df):
 
 def run_statistical_test(df):
     df["weekday"] = df["date"].dt.day_name()
-    mon = df[df["weekday"] == "Monday"]["price"]
-    fri = df[df["weekday"] == "Friday"]["price"]
-    t_stat, p_val = ttest_ind(mon, fri, equal_var=False)
+    don = df[df["weekday"] == "Thursday"]["price"]
+    sam = df[df["weekday"] == "Saturday"]["price"]
+
+    print(f"🔍 Anzahl Flüge - Donnerstag: {len(don)}, Samstag: {len(sam)}")
+
+    if len(don) < 2 or len(sam) < 2:
+        print("⚠️ Zu wenig Daten für einen sauberen t-Test.")
+        return float('nan'), float('nan')
+
+    t_stat, p_val = ttest_ind(don, sam, equal_var=False)
     return t_stat, p_val
