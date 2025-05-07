@@ -68,14 +68,14 @@ def analyze_price_distribution(df):
     return df.describe()
 
 def compare_weekday_prices(df):
-    df["weekday"] = df["date"].dt.day_name()
-    weekdays = df.groupby("weekday")["price"].mean()
+    df["weekday"] = df["Reisedatum"].dt.day_name()
+    weekdays = df.groupby("weekday")["Preis (CHF)"].mean()
     return weekdays
 
 def run_statistical_test(df):
-    df["weekday"] = df["date"].dt.day_name()
-    don = df[df["weekday"] == "Thursday"]["price"]
-    sam = df[df["weekday"] == "Saturday"]["price"]
+    df["weekday"] = df["Reisedatum"].dt.day_name()
+    don = df[df["weekday"] == "Thursday"]["Preis (CHF)"]
+    sam = df[df["weekday"] == "Saturday"]["Preis (CHF)"]
 
     print(f"🔍 Anzahl Flüge - Donnerstag: {len(don)}, Samstag: {len(sam)}")
 
