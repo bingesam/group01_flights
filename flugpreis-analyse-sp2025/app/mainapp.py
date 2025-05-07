@@ -3,12 +3,13 @@ import os
 import pandas as pd
 from scipy.stats import ttest_ind
 from dotenv import load_dotenv
+import re
 
 # Token laden
 load_dotenv()
 TOKEN = os.getenv("TRAVELPAYOUTS_TOKEN")
 
-def fetch_flight_data(origin="FRA", destination="BCN", currency="EUR"):
+def fetch_flight_data(origin="ZRH", destination="BCN", currency="CHF"):
     url = "https://api.travelpayouts.com/v2/prices/latest"
     
     headers = {
@@ -23,8 +24,8 @@ def fetch_flight_data(origin="FRA", destination="BCN", currency="EUR"):
     
     response = requests.get(url, headers=headers, params=params)
     
-    print("Status Code:", response.status_code)
-    print("Antworttext:", response.text[:300])  # Nur Vorschau anzeigen
+    #print("Status Code:", response.status_code)
+    #print("Antworttext:", response.text[:300])  # Nur Vorschau anzeigen
     
     if response.status_code != 200:
         print("❗ Fehler beim Abrufen der Flugdaten")
@@ -40,22 +41,28 @@ def prepare_dataframe(api_data):
         date = item.get("depart_date")
         price = item.get("value")
         transfers = item.get("number_of_changes", 0)
-        
+        duration = item.get("duration")
+        found_at = item.get("found_at")
+        search_day = extract_search_dayname(found_at)
+
         if date and price:
             records.append({
-                "date": date,
-                "price": price,
-                "transfers": transfers
+                "Reisedatum": date,
+                "Preis (CHF)": price,
+                "Anzahl Transfers": transfers,
+                "Flugdauer (Minuten)": duration,
+                "Wochentag der Suche": search_day
             })
-    
+
     df = pd.DataFrame(records)
-    
+
     if df.empty:
         print("⚠️ Keine gültigen Flugdaten im DataFrame!")
     else:
-        df['date'] = pd.to_datetime(df['date'])  # Datumsfeld umwandeln
-    
+        df['Reisedatum'] = pd.to_datetime(df['Reisedatum'])  # Datumsfeld umwandeln
+
     return df
+
 
 def analyze_price_distribution(df):
     return df.describe()
@@ -78,3 +85,11 @@ def run_statistical_test(df):
 
     t_stat, p_val = ttest_ind(don, sam, equal_var=False)
     return t_stat, p_val
+
+def extract_search_dayname(timestamp):
+    """Gibt den Wochentag (Montag, Dienstag, ...) aus einem ISO-Timestamp zurück"""
+    match = re.search(r"^(\d{4}-\d{2}-\d{2})", timestamp)
+    if match:
+        date_str = match.group(1)
+        return pd.to_datetime(date_str).day_name()
+    return None
