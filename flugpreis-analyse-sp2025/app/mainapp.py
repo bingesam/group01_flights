@@ -4,36 +4,32 @@ import pandas as pd
 from scipy.stats import ttest_ind
 from dotenv import load_dotenv
 import re
+import requests
 
-# Token laden
 load_dotenv()
 TOKEN = os.getenv("TRAVELPAYOUTS_TOKEN")
 
 def fetch_flight_data(origin="ZRH", destination="BCN", currency="CHF"):
     url = "https://api.travelpayouts.com/v2/prices/latest"
-    
-    headers = {
-        "X-Access-Token": TOKEN
-    }
-    
+    headers = {"X-Access-Token": TOKEN}
     params = {
         "origin": origin,
         "destination": destination,
         "currency": currency
     }
-    
     response = requests.get(url, headers=headers, params=params)
-    
-    #print("Status Code:", response.status_code)
-    #print("Antworttext:", response.text[:300])  # Nur Vorschau anzeigen
-    
     if response.status_code != 200:
         print("❗ Fehler beim Abrufen der Flugdaten")
         return []
-    
     data = response.json()
     return data.get("data", [])
 
+def extract_search_dayname(timestamp):
+    match = re.search(r"^(\d{4}-\d{2}-\d{2})", timestamp)
+    if match:
+        date_str = match.group(1)
+        return pd.to_datetime(date_str).day_name()
+    return None
 
 def prepare_dataframe(api_data):
     records = []
@@ -56,40 +52,55 @@ def prepare_dataframe(api_data):
 
     df = pd.DataFrame(records)
 
-    if df.empty:
-        print("⚠️ Keine gültigen Flugdaten im DataFrame!")
-    else:
-        df['Reisedatum'] = pd.to_datetime(df['Reisedatum'])  # Datumsfeld umwandeln
+    if not df.empty:
+        df['Reisedatum'] = pd.to_datetime(df['Reisedatum'])
 
     return df
-
 
 def analyze_price_distribution(df):
     return df.describe()
 
 def compare_weekday_prices(df):
     df["weekday"] = df["Reisedatum"].dt.day_name()
-    weekdays = df.groupby("weekday")["Preis (CHF)"].mean()
-    return weekdays
+    return df.groupby("weekday")["Preis (CHF)"].mean()
 
 def run_statistical_test(df):
     df["weekday"] = df["Reisedatum"].dt.day_name()
     don = df[df["weekday"] == "Thursday"]["Preis (CHF)"]
     sam = df[df["weekday"] == "Saturday"]["Preis (CHF)"]
 
-    print(f"🔍 Anzahl Flüge - Donnerstag: {len(don)}, Samstag: {len(sam)}")
-
     if len(don) < 2 or len(sam) < 2:
-        print("⚠️ Zu wenig Daten für einen sauberen t-Test.")
         return float('nan'), float('nan')
 
     t_stat, p_val = ttest_ind(don, sam, equal_var=False)
     return t_stat, p_val
 
-def extract_search_dayname(timestamp):
-    """Gibt den Wochentag (Montag, Dienstag, ...) aus einem ISO-Timestamp zurück"""
-    match = re.search(r"^(\d{4}-\d{2}-\d{2})", timestamp)
-    if match:
-        date_str = match.group(1)
-        return pd.to_datetime(date_str).day_name()
-    return None
+def together_explain_weekday_prices(df):
+    weekday_avg = df.groupby("weekday")["Preis (CHF)"].mean().sort_values()
+    trend_text = "\n".join([f"{tag}: {preis:.2f} CHF" for tag, preis in weekday_avg.items()])
+
+    prompt = f"""
+Hier sind durchschnittliche Flugpreise pro Wochentag:
+
+{trend_text}
+
+Analysiere bitte in 3–4 Sätzen: Wann ist Fliegen am günstigsten? Gibt es Auffälligkeiten?
+"""
+
+    url = "https://api.together.xyz/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {os.getenv('TOGETHER_API_KEY')}",
+        "Content-Type": "application/json"
+    }
+
+    data = {
+        "model": "mistralai/Mistral-7B-Instruct-v0.2",
+        "messages": [
+            {"role": "user", "content": prompt}
+        ]
+    }
+
+    response = requests.post(url, headers=headers, json=data)
+    response.raise_for_status()
+
+    return response.json()["choices"][0]["message"]["content"]
