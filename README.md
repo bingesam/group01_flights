@@ -34,6 +34,7 @@ Dieses Projekt untersucht, wie sich Flugpreise abhängig von Wochentag, Reisezie
 Inhalt der Datei `.env`:
 
 TRAVELPAYOUTS_TOKEN=dein_token_hier
+TOGETHER_API_KEY=dein_token_hier
 
 ### 3. Notwendige Pakete installieren
 
