@@ -6,3 +6,4 @@ scipy==1.15.2
 streamlit==1.44.1
 requests==2.32.3
 python-dotenv==1.1.0
+sqlite3-binary==0.0.3

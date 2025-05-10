@@ -1,4 +1,4 @@
-# Flugpreis-Analyse (SP 2025)
+# Flugpreis-Analyse (Scientific Programming FS2025)
 
 Dieses Projekt untersucht, wie sich Flugpreise abhängig von Wochentag, Reiseziel und Saison verändern. Die Daten werden per Travelpayouts-API abgerufen, in einer SQLite-Datenbank gespeichert und in einer interaktiven Streamlit-App analysiert.
 
@@ -15,13 +15,16 @@ Dieses Projekt untersucht, wie sich Flugpreise abhängig von Wochentag, Reisezie
 ## Inhalte
 
 - Web-API-Anbindung (Travelpayouts)
-- Datenaufbereitung mit Pandas
-- Regex-Nutzung zur Zeitanalyse
-- Explorative Datenanalyse und Visualisierungen
+- Datenaufbereitung mit Pandas inkl. Typenumwandlung
+- Regex-Nutzung zur Extraktion von Zeitinformationen
+- Nutzung von Python-Datenstrukturen (Listen, Dictionaries etc.)
+- Kontrollstrukturen: Bedingungen und Schleifen
+- Explorative Datenanalyse und Visualisierungen (Matplotlib, Seaborn)
 - Statistische Auswertung (t-Test mit p-Wert)
 - Speicherung in SQLite-Datenbank inkl. SQL-Query
-- Interaktive Streamlit-Web-App
-- Optionale Analyse im Jupyter Notebook
+- Interaktive Streamlit-Web-App zur Darstellung und Analyse
+- Analyse mit einem Large Language Model (LLM) via Together.ai
+- Analyse im Jupyter Notebook
 
 ---
 
@@ -35,6 +38,8 @@ Inhalt der Datei `.env`:
 
 TRAVELPAYOUTS_TOKEN=dein_token_hier
 TOGETHER_API_KEY=dein_token_hier
+
+> Wichtig: Diese Datei **nicht ins Repository hochladen** – sie enthält private Zugangsdaten!
 
 ### 3. Notwendige Pakete installieren
 
