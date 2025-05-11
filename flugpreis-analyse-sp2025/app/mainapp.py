@@ -47,17 +47,17 @@ def prepare_dataframe(api_data):
 
         if date and price:
             records.append({
-                "Reisedatum": date,
-                "Preis (CHF)": price,
-                "Anzahl Transfers": transfers,
-                "Flugdauer (Minuten)": duration,
-                "Wochentag der Suche": search_day
+                "Travel date": date,
+                "Price (CHF)": price,
+                "Number of transfers": transfers,
+                "Flight duration (minutes)": duration,
+                "Weekday of search": search_day
             })
 
     df = pd.DataFrame(records)  # Create DataFrame
 
     if not df.empty:
-        df['Reisedatum'] = pd.to_datetime(df['Reisedatum'])  # Parse dates correctly
+        df['Travel date'] = pd.to_datetime(df['Travel date'])  # Parse dates correctly
 
     return df
 
@@ -67,14 +67,14 @@ def analyze_price_distribution(df):
 
 # Group prices by weekday and calculate the mean
 def compare_weekday_prices(df):
-    df["weekday"] = df["Reisedatum"].dt.day_name()   # Extract weekday
-    return df.groupby("weekday")["Preis (CHF)"].mean()  # Calculate average
+    df["weekday"] = df["Travel date"].dt.day_name()   # Extract weekday
+    return df.groupby("weekday")["Price (CHF)"].mean()  # Calculate average
 
 # Perform a t-test between prices on Thursday and Saturday
 def run_statistical_test(df):
-    df["weekday"] = df["Reisedatum"].dt.day_name()
-    don = df[df["weekday"] == "Thursday"]["Preis (CHF)"]
-    sam = df[df["weekday"] == "Saturday"]["Preis (CHF)"]
+    df["weekday"] = df["Travel date"].dt.day_name()
+    don = df[df["weekday"] == "Thursday"]["Price (CHF)"]
+    sam = df[df["weekday"] == "Saturday"]["Price (CHF)"]
 
     if len(don) < 2 or len(sam) < 2:
         return float('nan'), float('nan')  # Not enough data to test
@@ -85,7 +85,7 @@ def run_statistical_test(df):
 # Use Together.ai (Mistral model) to analyze flight price trends
 def together_explain_weekday_prices(df):
     # Calculate and sort average prices by weekday
-    weekday_avg = df.groupby("weekday")["Preis (CHF)"].mean().sort_values()
+    weekday_avg = df.groupby("weekday")["Price (CHF)"].mean().sort_values()
     trend_text = "\n".join([f"{tag}: {preis:.2f} CHF" for tag, preis in weekday_avg.items()])
 
     # Prepare prompt for the language model

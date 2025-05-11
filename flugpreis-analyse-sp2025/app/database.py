@@ -23,8 +23,8 @@ def load_from_database(db_path="/workspaces/group01_flights/flugpreis-analyse-sp
 def query_average_price_per_weekday(db_path="/workspaces/group01_flights/flugpreis-analyse-sp2025/data/fluege.db"):
     conn = sqlite3.connect(db_path)  # Open database connection
     query = """
-    SELECT strftime('%w', Reisedatum) AS WochentagNum,  -- Extract numeric weekday (0=Sunday, ..., 6=Saturday)
-           CASE strftime('%w', Reisedatum)              -- Convert weekday number to weekday name
+    SELECT strftime('%w', "Travel date") AS WochentagNum,  -- Extract numeric weekday (0=Sunday, ..., 6=Saturday)
+           CASE strftime('%w', "Travel date")              -- Convert weekday number to weekday name
                WHEN '0' THEN 'Sunday'
                WHEN '1' THEN 'Monday'
                WHEN '2' THEN 'Tuesday'
@@ -33,7 +33,7 @@ def query_average_price_per_weekday(db_path="/workspaces/group01_flights/flugpre
                WHEN '5' THEN 'Friday'
                WHEN '6' THEN 'Saturday'
            END AS Wochentag,
-           AVG("Preis (CHF)") AS Durchschnittspreis     -- Calculate average price per day
+           AVG("Price (CHF)") AS Durchschnittspreis     -- Calculate average price per day
     FROM flugpreise
     GROUP BY WochentagNum                                -- Group by numeric weekday (to maintain correct order)
     ORDER BY WochentagNum                                -- Sort by weekday number (not alphabetically)

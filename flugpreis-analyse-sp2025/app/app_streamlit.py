@@ -52,12 +52,12 @@ if not st.session_state.df.empty:
 
     # Line chart: price trend over time
     st.subheader("Price Trend")
-    st.line_chart(df.set_index("Reisedatum")["Preis (CHF)"])
+    st.line_chart(df.set_index("Travel date")["Price (CHF)"])
 
     # Bar chart: average price per weekday
     st.subheader("Average Price by Weekday")
-    df["weekday"] = pd.to_datetime(df["Reisedatum"]).dt.day_name()
-    st.bar_chart(df.groupby("weekday")["Preis (CHF)"].mean())
+    df["weekday"] = pd.to_datetime(df["Travel date"]).dt.day_name()
+    st.bar_chart(df.groupby("weekday")["Price (CHF)"].mean())
 
     # SQL-based analysis: weekday grouping from DB
     st.subheader("SQL-Based Analysis (from Database)")
@@ -72,7 +72,7 @@ if not st.session_state.df.empty:
 
     df = st.session_state.df
     if "weekday" not in df.columns:
-        df["weekday"] = pd.to_datetime(df["Reisedatum"]).dt.day_name()
+        df["weekday"] = pd.to_datetime(df["Travel date"]).dt.day_name()
 
     if st.button("Start Together AI Analysis"):
         try:
