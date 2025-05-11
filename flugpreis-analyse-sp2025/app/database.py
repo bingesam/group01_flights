@@ -1,30 +1,30 @@
-# Notwendige Bibliotheken importieren
+# Import necessary libraries
 import sqlite3
 import pandas as pd
 
-# Funktion zum Speichern eines DataFrames in die SQLite-Datenbank
+# Function to save a DataFrame to a SQLite database
 def save_to_database(df, db_path="/workspaces/group01_flights/flugpreis-analyse-sp2025/data/fluege.db"):
-    conn = sqlite3.connect(db_path)  # Verbindung zur Datenbank herstellen
-    df.to_sql("flugpreise", conn, if_exists="replace", index=False)  # Tabelle 'flugpreise' speichern (alte Version wird ersetzt)
-    conn.close()  # Verbindung wieder schließen
+    conn = sqlite3.connect(db_path)  # Establish connection to the database
+    df.to_sql("flugpreise", conn, if_exists="replace", index=False)  # Save the DataFrame to table 'flugpreise' (replace if exists)
+    conn.close()  # Close the connection
 
-# Funktion zum Laden aller Flugdaten aus der Datenbank
+# Function to load all flight data from the database
 def load_from_database(db_path="/workspaces/group01_flights/flugpreis-analyse-sp2025/data/fluege.db"):
-    conn = sqlite3.connect(db_path)  # Verbindung herstellen
+    conn = sqlite3.connect(db_path)  # Open connection
     try:
-        df = pd.read_sql("SELECT * FROM flugpreise", conn)  # SQL-Abfrage zum Laden aller Daten
+        df = pd.read_sql("SELECT * FROM flugpreise", conn)  # SQL query to load all data
     except Exception as e:
-        print("Fehler beim Laden aus der DB:", e)  # Fehlerbehandlung, z. B. falls Tabelle nicht existiert
-        df = pd.DataFrame()  # Leeren DataFrame zurückgeben, um Absturz zu vermeiden
+        print("Error loading from database:", e)  # Handle errors (e.g., table does not exist)
+        df = pd.DataFrame()  # Return empty DataFrame to avoid crash
     conn.close()
-    return df  # Ergebnis zurückgeben
+    return df  # Return result
 
-# Funktion zum Abfragen des durchschnittlichen Flugpreises pro Wochentag (direkt per SQL)
+# Function to query average flight price per weekday (using raw SQL)
 def query_average_price_per_weekday(db_path="/workspaces/group01_flights/flugpreis-analyse-sp2025/data/fluege.db"):
-    conn = sqlite3.connect(db_path)  # Verbindung zur Datenbank
+    conn = sqlite3.connect(db_path)  # Open database connection
     query = """
-    SELECT strftime('%w', Reisedatum) AS WochentagNum,  -- Extrahiere numerischen Wochentag (0=Sonntag, ..., 6=Samstag)
-           CASE strftime('%w', Reisedatum)              -- Wandelt Wochentagsnummer in Klartext um
+    SELECT strftime('%w', Reisedatum) AS WochentagNum,  -- Extract numeric weekday (0=Sunday, ..., 6=Saturday)
+           CASE strftime('%w', Reisedatum)              -- Convert weekday number to weekday name
                WHEN '0' THEN 'Sunday'
                WHEN '1' THEN 'Monday'
                WHEN '2' THEN 'Tuesday'
@@ -33,11 +33,11 @@ def query_average_price_per_weekday(db_path="/workspaces/group01_flights/flugpre
                WHEN '5' THEN 'Friday'
                WHEN '6' THEN 'Saturday'
            END AS Wochentag,
-           AVG("Preis (CHF)") AS Durchschnittspreis     -- Berechne Durchschnittspreis pro Tag
+           AVG("Preis (CHF)") AS Durchschnittspreis     -- Calculate average price per day
     FROM flugpreise
-    GROUP BY WochentagNum                                -- Gruppiere nach numerischem Wochentag (für richtige Reihenfolge)
-    ORDER BY WochentagNum                                -- Sortiere nach Tagesreihenfolge (nicht alphabetisch)
+    GROUP BY WochentagNum                                -- Group by numeric weekday (to maintain correct order)
+    ORDER BY WochentagNum                                -- Sort by weekday number (not alphabetically)
     """
-    df = pd.read_sql(query, conn)  # SQL-Abfrage ausführen und Ergebnis als DataFrame laden
-    conn.close()  # Verbindung schliessen
-    return df     # Ergebnis zurückgeben
+    df = pd.read_sql(query, conn)  # Execute SQL query and load result into DataFrame
+    conn.close()  # Close connection
+    return df     # Return result

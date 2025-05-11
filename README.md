@@ -1,7 +1,6 @@
-# Flugpreis-Analyse (Scientific Programming FS2025)
+# Flight Price Analysis (Scientific Programming FS2025)
 
-Dieses Projekt untersucht, wie sich Flugpreise abhängig von Wochentag, Reiseziel und Saison verändern. Die Daten werden per Travelpayouts-API abgerufen, in einer SQLite-Datenbank gespeichert und in einer interaktiven Streamlit-App analysiert.
-
+This project investigates how flight prices vary depending on the day of the week, destination, and season. The data is retrieved via the Travelpayouts API, stored in a SQLite database, and analyzed in an interactive Streamlit app.
 ---
 
 ## Team
@@ -12,55 +11,53 @@ Dieses Projekt untersucht, wie sich Flugpreise abhängig von Wochentag, Reisezie
 
 ---
 
-## Inhalte
+## Contents
 
-- Web-API-Anbindung (Travelpayouts)
-- Datenaufbereitung mit Pandas inkl. Typenumwandlung
-- Regex-Nutzung zur Extraktion von Zeitinformationen
-- Nutzung von Python-Datenstrukturen (Listen, Dictionaries etc.)
-- Kontrollstrukturen: Bedingungen und Schleifen
-- Explorative Datenanalyse und Visualisierungen (Matplotlib, Seaborn)
-- Statistische Auswertung (t-Test mit p-Wert)
-- Speicherung in SQLite-Datenbank inkl. SQL-Query
-- Interaktive Streamlit-Web-App zur Darstellung und Analyse
-- Analyse mit einem Large Language Model (LLM) via Together.ai
-- Analyse im Jupyter Notebook
+- Web API integration (Travelpayouts)
+- Data preparation with Pandas including type conversion
+- Use of regular expressions (regex) to extract time information
+- Use of Python data structures (lists, dictionaries, etc.)
+- Control structures: conditions and loops
+- Exploratory data analysis and visualizations (Matplotlib, Seaborn)
+- Statistical analysis (t-test with p-value)
+- Storage in a SQLite database including SQL query
+- Interactive Streamlit web app for presentation and analysis
+- Analysis with a Large Language Model (LLM) via Together.ai
+- Analysis in a Jupyter Notebook
 
 ---
 
 ## Projekt starten
 
-### 1. Repository klonen (falls noch nicht geschehen)
+### 1. Clone the repository (if not already done)
+### 2. Create a .env file with your API credentials
+Contents of the .env file:
 
-### 2. `.env`-Datei erstellen mit deinem API-Zugang
+TRAVELPAYOUTS_TOKEN=your_token_here 
+TOGETHER_API_KEY=your_token_here 
 
-Inhalt der Datei `.env`:
+> Important: **Do not upload this file to the repository** – it contains private credentials! 
 
-TRAVELPAYOUTS_TOKEN=dein_token_hier
-TOGETHER_API_KEY=dein_token_hier
-
-> Wichtig: Diese Datei **nicht ins Repository hochladen** – sie enthält private Zugangsdaten!
-
-### 3. Notwendige Pakete installieren
+### 3. Install required packages
 
 pip install -r requirements.txt
 
-### 4. Streamlit-Web-App starten
+### 4. Start the Streamlit web app
 
 streamlit run app/app_streamlit.py
 
--> Die App läuft dann lokal im Browser auf http://localhost:8501
+-> The app will run locally in the browser at http://localhost:8501
 
 ---
 
-## Jupyter Notebook
+## Jupyter notebook
 
-Zur Analyse und Visualisierung kann das begleitende Jupyter Notebook verwendet werden:
+The accompanying Jupyter notebook can be used for further analysis and visualization:
 
-### Notebook starten
+### Start notebook
 
 jupyter lab notebooks/flugpreis_analyse.ipynb
 
-Alternativ in VS Code direkt im Ordner `notebooks/` öffnen.
+Alternatively, open directly in VS Code under the notebooks/ folder.
 
 
